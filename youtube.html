@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <style>
+        nav{
+            display: flex;
+            padding: 5px;
+            justify-content: space-between;
+            height: 30px;
+        }
+        i{
+            padding: 5px;
+        }
+        img{
+            margin-top: 0px;
+            width: 100px;
+            height: 40px;
+        }
+        nav > div{
+            display: flex;
+        }
+        div > input{
+            width: 400px;
+        }
+        #container > div{
+            width: 560px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <img src="https://www.hit-counts.com/wp-content/uploads/2017/09/youtube-new-logo-e1504250123885.jpg" alt="YouTube Logo">
+        <div id="search-bar"><input type="text" id="search" placeholder="Search">
+        <button type="submit"><i class="fa fa-search"></i></button>
+        <i class="fa fa-microphone" style="font-size: 15px; padding: 8px; border: none; background: rgb(240, 237, 237); border-radius: 20px; margin-left: 10px;"></i>
+        </div>
+        <div>
+            <i class="fa fa-video-camera"></i>
+            <i class="fa fa-bars"></i>
+            <i class="fa fa-bell"></i>
+            <i class="fa fa-user"></i>
+        </div>
+    </nav>
+    <div id="container"></div>
+    <script>
+        window.addEventListener('load', () =>{
+            var btn = document.querySelector('button');
+            btn.addEventListener('click', youtubeSearch)
+        })
+
+        function youtubeSearchResults(search) {
+            return  fetch(`https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=${search}&key=AIzaSyCZq5-lGHoVu4K2osb7lQey1CdEErk0Bk8&maxResults=20`)
+            .then(response => response.json())
+        }
+
+        function displayCards(video){
+            const div = document.createElement('div');
+            // if(video.id.kind === types.channel){
+            //     return false
+            // }
+            div.innerHTML=`<iframe width="560" height="315" src="https://www.youtube.com/embed/${video.id.videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+            return div
+        }
+
+        async function youtubeSearch() {
+            const search = document.querySelector('input').value;
+            try{
+                const{
+                    items: results,
+                    pageInfo:{
+                        resultsPerPage,
+                        totalResults
+                    }
+                }=await youtubeSearchResults(search)
+                console.log(results, resultsPerPage, totalResults)
+                const cards = [];
+                for(let video of results){
+                    const card = displayCards(video)
+                    if(card){
+                        cards.push(card)
+                    }
+                }
+                const cont = document.getElementById('container')
+                cont.innerHTML = null;
+                cont.append(...cards);
+            }
+            catch(err){
+
+            }
+        }
+    </script>
+</body>
+</html>
